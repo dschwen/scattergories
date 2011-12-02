@@ -1,0 +1,34 @@
+body {
+  background-color: #eeeeee;
+  display: -webkit-box;
+  -webkit-box-orient: horizontal;
+  -webkit-box-pack: center;
+  -webkit-box-align: center;
+
+  display: -moz-box;
+  -moz-box-orient: horizontal;
+  -moz-box-pack: center;
+  -moz-box-align: center;
+
+  display: box;
+  box-orient: horizontal;
+  box-pack: center;
+  box-align: center;
+}
+
+#gamepad {
+  background-color: white;
+  border: 1px solid black;
+  width: 800px; height: 400px;
+  box-shadow: 10px 10px 15px rgba(0,0,0,0.25); 
+}
+  
+input {
+  border: none;
+  border-bottom: 1px solid gray;
+  width: 200px;
+}
+  
+#log {
+  position: absolute; bottom: 0px;
+}

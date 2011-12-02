@@ -4,6 +4,7 @@ var app = require('http').createServer(handler)
   , mongodb = require('mongodb'), db, mcol = null, map = {d:[]}
   , files = [ 
       'lib/jquery-1.7.min.js', 'lib/jquery.event.drag-2.0.min.js', 'lib/all.js',
+      'css/style.css',
       'index.html', 'favicon.ico' 
     ], cache = {}
   , alias = { '/': '/index.html' }

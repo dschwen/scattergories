@@ -1,34 +1,16 @@
 <html>
 <head>
 <title>Sockettest</title>
+<link href="css/style.css" rel="stylesheet" type="text/css" />
 <script src="/socket.io/socket.io.js"></script>
 <script src="/lib/jquery-1.7.min.js"></script>
 <script src="/lib/jquery.event.drag-2.0.min.js"></script>
 <script src="/lib/all.js"></script>
-<style>
-  #menu {
-    background-color: white;
-    border: 1px solid black;
-    position: absolute;
-    right: -1px;
-    width: 20px;
-    overflow: hidden;
-  }
-  body {
-    margin: 0px; padding: 0px;
-    overflow: hidden;
-  }
-  #log {
-    position: absolute; bottom: 0px;
-  }
-</style>
 </head>
 <body>
+<div id="gamepad"></div>
+
 <div id="log"></div>
-<canvas id="game"></canvas>
-<div id="menu">
-  <img src="tiles/tiles.png" id="tiles"/>
-</div>
 <script>
   var l = document.location,
       attempt = 1,
@@ -44,75 +26,9 @@
       v = { x:0, y: 0 }; // viewport (x,y,w,h,ox,oy,cw,ch,csw,csh)
 
       
-  function updateMap() {
-    for( var x=0; x<v.w; ++x ) {
-      for( var y=0; y<v.h; ++y ) {
-        updateTile(x,y);
-      }
-    }
-  }
-
-  // resize
-  function resize() {
-    var w = $(window).width(),
-        h = $(window).height(),
-        mh = $('#menu').height();
-
-    can.width = Math.floor(w/2);
-    can.height = Math.floor(h/2);
-    $(can).css( { width: w, height: h } );
-
-    v.cw = can.width; 
-    v.ch = can.height;
-    v.csw = w;
-    v.csh = h,
-    v.w = Math.ceil(v.cw/16);
-    v.h = Math.ceil(v.ch/16),   // width and height 
-    v.ox = (v.w*16-v.cw)/2;
-    v.oy = (v.h*16-v.ch)/2;           // offset in tile pixels 
-
-    updateMap();
-
-    $('#menu').css( { top: (h/2-mh/2) } );
-  }
-  resize();
-  $(window).resize(resize);
-
-  // hook up menu
-  $('#menu')
-    .mouseenter( function() { $('#menu').css('width', 25*16+20 ); } )
-    .mouseleave( function() { $('#menu').css('width', 20 ); } );
-
-  //get map
-  function getMap(x,y) {
-    if( map[x] !== null && map[x] !== undefined ) {
-      return map[x][y] || [ Math.floor(7+Math.random()*2), 0 ];
-    }
-    return [ Math.floor(7+Math.random()*2), 0 ];
-  }
-  function drawTile(n,x,y) {
-    c.drawImage( tiles, (n%25)*16,Math.floor(n/25)*16, 16,16, (x-v.x)*16-v.ox,(y-v.y)*16-v.oy,16,16 );
-  }
-  function updateTile(x,y) {
-    var t = getMap(x,y);
-    if( t[0]>0 ) {
-      drawTile(t[0],x,y);
-    }
-    if( t[1]>0 ) {
-      drawTile(t[1],x,y);
-    }
-  }
-  function paintSingle(e) {
-    var x = Math.floor((e.offsetX+v.ox)*v.cw/(v.csw*16.0)),
-        y = Math.floor((e.offsetY+v.oy)*v.ch/(v.csh*16.0)),
-        data;
-    if( e.shiftKey ) {
-      data = { set: [{ front:tile[1], x:x, y:y }] };
-    } else {
-      data = { set: [{ back:tile[0], x:x, y:y }] };
-    }
-    socket.emit( 'update', data );
-    //applyEvent(data);
+  function keyenter(e) {
+    console.log(e.target);
+    socket.emit( 'update', { n: , word: '' } );
   }
 
   // connection established
@@ -121,56 +37,20 @@
     map = data.map;
   }) );
 
-  // initialize tile loading
-  $(tiles)
-    .load( All.group('init',function(){
-      // build UI
-    }) )
-    .error(function(){
-      alert('error loading tiles.png');
-    })
-    .attr('src','tiles/tiles.png');
-
-  // once both events in the 'init' group were fired
-  All.final('init',function() {
-    $('#log').append( $('<div></div').text('Tiles loaded!') );
-    updateMap();
-
-    // hook up click event
-    $('#game').click(paintSingle);
-
-    // hook up drag events
-  });
-
-  function applyEvent(d) {
-    // allocate sparse array elements
-    if( !map[d.x] ) { map[d.x] = []; }
-    if( !map[d.x][d.y] ) { map[d.x][d.y] = [0,0]; }
-
-    d.back!==undefined && ( map[d.x][d.y][0] = d.back );
-    d.front!==undefined && ( map[d.x][d.y][1] = d.front );
-    updateTile(d.x,d.y);
-  }
-
-  // receive tile update event
+  // receive countdown event
   socket.on( 'update', function (data) {
-    var i, d;
-    //console.log(data);
-    for( i=0; i<data.set.length; ++i ) {
-      applyEvent(data.set[i]);
-    }
+    console.log(data.n);
   } );
 
-  // temporary menu
-  $('#tiles').click(function(e){
-    var x = Math.floor(e.offsetX/16),
-        y = Math.floor(e.offsetY/16);
-    if( e.shiftKey ) {
-      tile[1] = y*25+x;
-    } else {
-      tile[0] = y*25+x;
-    }
-  });
+  // receive game start event
+  socket.on( 'startgame', function (data) {
+    console.log(data);
+  } );
+
+  // receive game start event
+  socket.on( 'stopgame', function (data) {
+    console.log(data);
+  } );
 
   // user handling/info events
   socket.on( 'newuser', function (data) {
