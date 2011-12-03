@@ -13,6 +13,7 @@ var app = require('http').createServer(handler)
             'Things you find at a carnival', 'Dangerous animals', 'Jewlery', 'Colors', 'Things you cannot afford',
             'Things to bring on a camping trip', 'Every party needs this', 'In the cinema', 'At the mall', 'Famous monuments',
             'Games', 'TV shows', 'Plants', 'Pets' ]
+  , selected = []
   , letters = 'ABCDEFGHIJKLMNOPRSTUVWZ'
   , users = {}
 
@@ -30,6 +31,22 @@ for( i = 0; i < files.length; ++i ) {
   addToCache(files[i]);
 }
 
+// select 12 random categories
+function selectCats() {
+  var i;
+  // reinsert old selection
+  while( selected.length >0 ) {
+    cat.push( selected.splice(0,1)[0] );
+  }
+  // pick random
+  for( i = 0; i < 12; ++i ) {
+    selected.push( cat.splice( Math.floor( Math.random() * cat.length ), 1 )[0] );
+  }
+}
+for( var j=0;j<5;++j) {
+selectCats();
+console.log(selected);
+}
 // start listening on port
 app.listen( process.env.PORT || 8001 );
 
