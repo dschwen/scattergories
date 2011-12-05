@@ -12,9 +12,11 @@ var app = require('http').createServer(handler)
   , cat = [ 'Rivers', 'Capitals', 'On the oceanside', 'Things you find in the forrest', 'Famous females', 'Superheroes', 
             'Things you find at a carnival', 'Dangerous animals', 'Jewlery', 'Colors', 'Things you cannot afford',
             'Things to bring on a camping trip', 'Every party needs this', 'In the cinema', 'At the mall', 'Famous monuments',
-            'Games', 'TV shows', 'Plants', 'Pets' ]
+            'Games', 'TV shows', 'Plants', 'Pets', 'At the cocktail bar', 'Funny movies', 'Scary things','Cars, makes & models',
+            'Bodies of water', 'Musical acts', 'Countries', 'Trouble with the law',  ]
   , selected = []
   , letters = 'ABCDEFGHIJKLMNOPRSTUVWZ'
+  , roundletter
   , users = {}
 
 // build file cache
@@ -38,14 +40,14 @@ function selectCats() {
   while( selected.length >0 ) {
     cat.push( selected.splice(0,1)[0] );
   }
-  // pick random
+  // pick random categories
   for( i = 0; i < 12; ++i ) {
     selected.push( cat.splice( Math.floor( Math.random() * cat.length ), 1 )[0] );
   }
 }
 for( var j=0;j<5;++j) {
 selectCats();
-console.log(selected);
+console.log(selected,roundletter);
 }
 // start listening on port
 app.listen( process.env.PORT || 8001 );
@@ -69,42 +71,56 @@ function handler( req, res ) {
   res.end(cache[req.url]);
 }
 
+// check for agreement on a consensus decission
+function checkConsensus(item) {
+  var current = false;
+
+  for( id in users ) { 
+    if( users.hasOwnProperty(id) ) {
+      if( !users[id].ready ) return;
+    }
+  }
+
+  // reset ready states
+  for( id in users ) { 
+    if( users.hasOwnProperty(id) ) {
+      users[id].ready = false;
+    }
+  }
+
+}
+
 io.sockets.on('connection', function (socket) {
 
-  socket.emit( 'ready', { motd: 'no news today!', map: map.d } );
-  socket.broadcast.emit( 'newuser', { id: socket.id } );
-  users[socket.id] = { ready: false, list: [] };
+  socket.emit( 'ready', { motd: '' } );
+  users[socket.id] = { ready: false, list: [], name: null };
   
-  socket.on('disconnect', function () {
-    users[socket.id] = undefined;
-    io.sockets.emit('userleft', { id: socket.id } );
+  socket.on('login', function (data) {
+    users[socket.id].name = data.name;
+    socket.broadcast.emit( 'newuser', { name: users[socket.id].name } );
   });
 
-  // user ready to start round
+  socket.on('disconnect', function () {
+    io.sockets.emit('userleft', { name: users[socket.id].name } );
+    users[socket.id] = undefined;
+  });
+
+
+  // user ready to start next letter
   socket.on('ready', function (data) {
     socket.broadcast.emit( 'ready', data );
     users[socket.id].ready = true;
     
     // check if all users are ready
-    for( id in users ) { 
-      if( users.hasOwnProperty(id) ) {
-        if( !users[id].ready ) return;
-      }
-    }
-
-    // reset ready states
-    for( id in users ) { 
-      if( users.hasOwnProperty(id) ) {
-        users[id].ready = false;
-      }
-    }
 
     // emit contdown start signal
     io.sockets.emit( 'startcountdown' );
 
     // deliver letter in 3 seconds
     setTimeout( function() {
-      io.sockets.emit( 'startgame', { letter: 'A' } );
+      // pick letter
+      roundletter = letters.substr(  Math.floor( Math.random() * letters.length ), 1 );
+      io.sockets.emit( 'startgame', { letter: roundletter } );
     }, 3000);
   } );
 

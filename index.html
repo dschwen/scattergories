@@ -8,33 +8,52 @@
 <script src="/lib/all.js"></script>
 </head>
 <body>
+
+<div class="ccontain">
 <div id="gamepad"></div>
+</div>
 
 <div id="log"></div>
+
+<div id="login" class="ccontain" style="display:none">
+  <div class="dark"></div>
+  <div id="loginbox">
+    <div id="#motd"></div>
+    Please enter your name to join the game<br/>
+    <input type="text"><button id="dologin">Join</button>
+  </div>
+</div>
+
 <script>
   var l = document.location,
-      attempt = 1,
       socket = io.connect( l.protocol + '//' + l.host, {
         'reconnect': true,
         'reconnection delay': 500,
         'max reconnection attempts': 10
-      }),
-      tile = [1,20],
-      tiles = new Image(), map = [],
-      can = $('#game')[0], 
-      c = can.getContext('2d'),
-      v = { x:0, y: 0 }; // viewport (x,y,w,h,ox,oy,cw,ch,csw,csh)
+      });
 
       
   function keyenter(e) {
     console.log(e.target);
-    socket.emit( 'update', { n: , word: '' } );
+    socket.emit( 'update', { n: 0, word: '' } );
   }
+  
+  // hook up login box
+  $('#loginbox>button').click(function(){
+    // log in
+    socket.emit( 'login', { name: $('#loginbox>input').val() } );
+    $('#login').fadeOut(200);
+  });
 
   // connection established
   socket.on( 'ready', All.group('init',function (data) {
-    $('#log').append( $('<div></div').text( data.motd ) );
-    map = data.map;
+    // add MOTD to the login box
+    if( data.motd) {
+      $('#motd').text(data.motd).show();
+    }
+    
+    // display login prompt
+    $('#login').fadeIn(200);
   }) );
 
   // receive countdown event
@@ -54,10 +73,10 @@
 
   // user handling/info events
   socket.on( 'newuser', function (data) {
-    $('#log').append( $('<div></div').text( 'user ' + data.id + ' connected' ) );
+    $('#log').append( $('<div></div').text( 'user ' + data.name + ' joined the game' ) );
   } );
   socket.on( 'userleft', function (data) {
-    $('#log').append( $('<div></div').text( 'user ' + data.id + ' left' ) );
+    $('#log').append( $('<div></div').text( 'user ' + data.name + ' left' ) );
   } );
   socket.on('disconnect', function () {
     $('#log').append( $('<div></div').text( "Disconnected :-(" ) );
