@@ -24,24 +24,43 @@
   </div>
 </div>
 
+<audio id="snd_bing" src="sound/complete.oga" preload="auto"></audio>
 <script>
   var l = document.location,
       socket = io.connect( l.protocol + '//' + l.host, {
         'reconnect': true,
         'reconnection delay': 500,
         'max reconnection attempts': 10
-      });
+      }),
+      lastsent = [];
 
       
-  function keyenter(e) {
-    console.log(e.target);
-    socket.emit( 'update', { n: 0, word: '' } );
+  function buildPad() {
+    function keyhandler(i) {
+      return function(e) {
+        var nval = $(e.target).val();
+        if( nval !== lastsent[i] ) {
+          lastsent[i] = nval;
+          socket.emit( 'update', { n: i, word: nval } );
+        }
+      }
+    }
+    var i, ol = $('<ol></ol>');
+    for( i = 0; i < 12; ++i ) {
+      ol.append(
+        $('<li></li>').append(
+          $('<input type="text">').attr('id','pad_'+i).keypress( keyhandler(i) ) 
+        ) 
+      );
+    }
+    $('#gamepad').append(ol);
   }
   
   // hook up login box
   $('#loginbox>button').click(function(){
     // log in
     socket.emit( 'login', { name: $('#loginbox>input').val() } );
+    $('#snd_bing')[0].play();
     $('#login').fadeOut(200);
   });
 

@@ -5,6 +5,7 @@ var app = require('http').createServer(handler)
   , files = [ 
       'lib/jquery-1.7.min.js', 'lib/jquery.event.drag-2.0.min.js', 'lib/all.js',
       'css/style.css',
+      'sound/complete.oga',
       'index.html', 'favicon.ico' 
     ], cache = {}
   , alias = { '/': '/index.html' }
