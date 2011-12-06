@@ -20,7 +20,9 @@
   <div id="loginbox">
     <div id="#motd"></div>
     Please enter your name to join the game<br/>
-    <input type="text"><button id="dologin">Join</button>
+    <form id="dologin">
+      <input type="text"><input type="submit" value="Join"/>
+    </form>
   </div>
 </div>
 
@@ -57,11 +59,12 @@
   }
   
   // hook up login box
-  $('#loginbox>button').click(function(){
+  $('#dologin').submit(function(){
     // log in
-    socket.emit( 'login', { name: $('#loginbox>input').val() } );
+    socket.emit( 'login', { name: $('#dologin>input').val() } );
     $('#snd_bing')[0].play();
     $('#login').fadeOut(200);
+    return false;
   });
 
   // connection established
