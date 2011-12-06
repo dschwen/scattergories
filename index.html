@@ -13,6 +13,7 @@
 <div id="gamepad">
 <div class="light green"></div>
 <div class="light red"></div>
+<ol id="categories"></ol>
 </div>
 
 
@@ -47,7 +48,8 @@
         'reconnection delay': 500,
         'max reconnection attempts': 10
       }),
-      lastsent = [];
+      lastsent = [],
+      catlist = [];
 
       
   function buildPad() {
@@ -69,6 +71,11 @@
       );
     }
     $('#gamepad').append(ol);
+    
+    for( i = 0; i < 12; ++i ) {
+      catlist[i] = $('<li></li>');
+      $('#categories').append(catlist[i]);
+    }
   }
   
   // hook up login box
@@ -114,9 +121,11 @@
     console.log(data.n);
   } );
 
-  // receive game start event
-  socket.on( 'startgame', function (data) {
-    console.log(data);
+  // receive categories
+  socket.on( 'categories', function (data) {
+    for( i = 0; i < 12; ++i ) {
+      catlist[i].text(data.list[i]);
+    }
   } );
 
   // receive game start event

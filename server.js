@@ -51,10 +51,7 @@ function selectCats() {
     selected.push( cat.splice( Math.floor( Math.random() * cat.length ), 1 )[0] );
   }
 }
-for( var j=0;j<5;++j) {
-selectCats();
-console.log(selected,roundletter);
-}
+
 // start listening on port
 app.listen( process.env.PORT || 8001 );
 
@@ -127,6 +124,9 @@ function checkConsensus(item) {
 
 // init game
 function initGame() {
+  // select categories for the next game
+  selectCats();
+
   // user ready to start next letter
   openVote('ready',function(consensus) {
     if( consensus ) {
@@ -154,6 +154,7 @@ io.sockets.on('connection', function (socket) {
     users[socket.id].name = data.name;
     users[socket.id].status = 1;
     socket.broadcast.emit( 'newuser', { name: users[socket.id].name } );
+    socket.emit( 'categories', { list: selected } );
   });
 
   socket.on('disconnect', function () {
