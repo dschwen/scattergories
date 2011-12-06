@@ -73,7 +73,7 @@ function handler( req, res ) {
 
 // check for agreement on a consensus decission
 function checkConsensus(item) {
-  var current = false;
+  var current = undefined;
 
   for( id in users ) { 
     if( users.hasOwnProperty(id) ) {
