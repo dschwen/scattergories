@@ -17,7 +17,7 @@ var app = require('http').createServer(handler)
             'At the mall', 'Famous monuments', 'Games', 'TV shows', 'Plants', 'Pets', 
             'At the cocktail bar', 'Funny movies', 'Scary things','Cars, makes & models',
             'Bodies of water', 'Musical acts', 'Countries', 'Trouble with the law', 
-            'Car parts', 'Magazines and journals' ]
+            'Car parts', 'Magazines and journals' 
           ]
   , selected = []
   , letters = 'ABCDEFGHIJKLMNOPRSTUVWZ'
@@ -79,8 +79,8 @@ function handler( req, res ) {
 
 
 // open vote and add callback
-function openVote(item,callback) {
-  votes[item] = callback;
+function openVote(item,callback,requiredStatus) {
+  votes[item] = { fn: callback, status: requiredStatus };
 }
 // close vote
 function closeVote(item,callback) {
@@ -92,6 +92,9 @@ function checkConsensus(item) {
 
   for( id in users ) { 
     if( users.hasOwnProperty(id) ) {
+      // only consider users with the required status
+      if( users[id].status !== votes[data.item].status ) continue;
+
       nplayer++;
       
       // at least one player has not voted yet
@@ -122,13 +125,34 @@ function checkConsensus(item) {
   return current;
 }
 
+// init game
+function initGame() {
+  // user ready to start next letter
+  openVote('ready',function(consensus) {
+    if( consensus ) {
+      console.log('All players ready!')
+      // deliver letter in 3 seconds
+      setTimeout( function() {
+        // pick letter
+        roundletter = letters.substr(  Math.floor( Math.random() * letters.length ), 1 );
+        io.sockets.emit( 'startgame', { letter: roundletter } );
+      }, 3000);
+    } else {
+      console.log('No players ready!')
+      initGame();
+    }
+  },1);
+}
+initGame();
+
 io.sockets.on('connection', function (socket) {
 
   socket.emit( 'ready', { motd: '' } );
-  users[socket.id] = { ready: false, list: [], name: null, vote: {} };
+  users[socket.id] = { ready: false, list: [], name: null, vote: {}, status: 0 };
   
   socket.on('login', function (data) {
     users[socket.id].name = data.name;
+    users[socket.id].status = 1;
     socket.broadcast.emit( 'newuser', { name: users[socket.id].name } );
   });
 
@@ -139,27 +163,23 @@ io.sockets.on('connection', function (socket) {
 
   socket.on('vote', function (data) {
     // is the vote open (callback set)
-    if( typeof(votes[data.item]) === 'function' ) {
-      users[socket.id].vote[data.item] = data.vote;
-      var consensus = checkConsensus(data.item);
-      if( consensus !== undefined ) {
-        (votes[data.item])(consensus);
-        closeVote(data.item);
-      }
-    } else {
+    if( votes[data.item] === undefined ) {
       console.log('Cheating! Voting on closed vote!');
-    };
-  });
+      return false;
+    }
+    if( votes[data.item].status !== users[socket.id].status ) {
+      console.log('User is not in the correct status!');
+      return false;
+    }
 
-  // user ready to start next letter
-  openVote('ready',function() {
-    console.log('All players ready!')
-    // deliver letter in 3 seconds
-    setTimeout( function() {
-      // pick letter
-      roundletter = letters.substr(  Math.floor( Math.random() * letters.length ), 1 );
-      io.sockets.emit( 'startgame', { letter: roundletter } );
-    }, 3000);
+    // apply vote and vheck consensus
+    users[socket.id].vote[data.item] = data.vote;
+    var consensus = checkConsensus(data.item),
+        callback = votes[data.item].fn;
+    if( consensus !== undefined ) {
+      closeVote(data.item);
+      callback(consensus);
+    }
   });
 
   // edit events get applied to the server copy of the map and rebroadcast to all clients

@@ -20,9 +20,17 @@
 
 <div id="log"></div>
 
+<div id="ready" class="ccontain" style="display:none">
+  <div class="dark"></div>
+    <div class="box">
+      <input type="checkbox" name="readybox" id="readybox"/><label for="readybox">I'm ready!</label>
+    </div>
+  </div>
+</div>
+
 <div id="login" class="ccontain" style="display:none">
   <div class="dark"></div>
-  <div id="loginbox">
+  <div class="box">
     <div id="#motd"></div>
     Please enter your name to join the game<br/>
     <form id="dologin">
@@ -69,11 +77,29 @@
     socket.emit( 'login', { name: $('#dologin>input').val() } );
     $('#snd_bing')[0].play();
     $('#login').fadeOut(200);
+    $('#ready').fadeIn(200);
     return false;
   });
 
+  // hook up ready checkbox
+  $('#readybox').change(function(){
+    socket.emit( 'vote', { item: 'ready', vote: $('#readybox').is(':checked') } );
+  });
+
+  // react to the outcome of a vote/consensus decission
+  socket.on( 'vote', function (data) {
+    switch(data.item) {
+      // everybody is ready
+      case 'ready':
+        if( data.outcome ) {
+          $('#ready').fadeOut(200);
+        }
+        break;
+    }
+  } );
+
   // connection established
-  socket.on( 'ready', All.group('init',function (data) {
+  socket.on( 'ready', function (data) {
     // add MOTD to the login box
     if( data.motd) {
       $('#motd').text(data.motd).show();
@@ -81,7 +107,7 @@
     
     // display login prompt
     $('#login').fadeIn(200);
-  }) );
+  } );
 
   // receive countdown event
   socket.on( 'update', function (data) {
