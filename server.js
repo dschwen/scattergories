@@ -74,6 +74,19 @@ function handler( req, res ) {
   res.end(cache[req.url]);
 }
 
+// change all users with status from to status to
+function changeStatus(from, to) {
+  var id;
+
+  for( id in users ) { 
+    if( users.hasOwnProperty(id) ) {
+      // only consider users with the required status
+      if( users[id].status === from ) {
+        users[id].status = to;
+      }
+    }
+  }
+}
 
 // open vote and add callback
 function openVote(item,callback,requiredStatus) {
@@ -85,12 +98,12 @@ function closeVote(item,callback) {
 }
 // check for agreement on a consensus decission
 function checkConsensus(item) {
-  var current = undefined, nplayer = 0;
+  var id, current = undefined, nplayer = 0;
 
   for( id in users ) { 
     if( users.hasOwnProperty(id) ) {
       // only consider users with the required status
-      if( users[id].status !== votes[data.item].status ) continue;
+      if( users[id].status !== votes[item].status ) continue;
 
       nplayer++;
       
@@ -133,9 +146,28 @@ function initGame() {
       console.log('All players ready!')
       // deliver letter in 3 seconds
       setTimeout( function() {
-        // pick letter
+        // pick and send letter
         roundletter = letters.substr(  Math.floor( Math.random() * letters.length ), 1 );
-        io.sockets.emit( 'startgame', { letter: roundletter } );
+        io.sockets.emit( 'startround', { letter: roundletter } );
+
+        // set status to 2 (in round)
+        changeStatus(1,2);
+
+        // stop round in 3 minutes
+        setTimeout( function() {
+          // set status to 3 (after round)
+          changeStatus(2,3);
+
+          // stop round by sending every user the server copy of their list
+          for( id in users ) { 
+            if( users.hasOwnProperty(id) ) {
+              // only consider users with the required status
+              if( users[id].status === 3 ) {
+                users[id].socket.emit('stopround', { list: users[id].list } );
+              }
+            }
+          }
+        }, 3*60*1000 );
       }, 3000);
     } else {
       console.log('No players ready!')
@@ -148,7 +180,7 @@ initGame();
 io.sockets.on('connection', function (socket) {
 
   socket.emit( 'ready', { motd: '' } );
-  users[socket.id] = { ready: false, list: [], name: null, vote: {}, status: 0 };
+  users[socket.id] = { ready: false, list: [], name: null, vote: {}, status: 0, socket: socket };
   
   socket.on('login', function (data) {
     users[socket.id].name = data.name;
@@ -186,7 +218,10 @@ io.sockets.on('connection', function (socket) {
   // edit events get applied to the server copy of the map and rebroadcast to all clients
   socket.on('update', function (data) {
     //socket.broadcast.emit( 'update', data );
-    user[socket.id].list[data.n] = data.word;
+    if( users[socket.id].status === 2 ) {
+      users[socket.id].list[data.n] = data.word;
+      console.log(data);
+    }
   } );
 
 

@@ -9,14 +9,19 @@
 </head>
 <body>
 
+<!--<div class="light green"></div>
+<div class="light red"></div>-->
+
 <div class="ccontain">
-<div id="gamepad">
-<div class="light green"></div>
-<div class="light red"></div>
-<ol id="categories"></ol>
-</div>
-
-
+  <div class="box">
+    <div id="letter" class="vote">?</div>
+    <ol id="categories"></ol>
+  </div>
+  <div id="gamepad" class="box">
+  </div>
+  <div id="filledpad" class="box">
+    <ol id="filledlist"></ol>
+  </div>
 </div>
 
 <div id="log"></div>
@@ -35,7 +40,7 @@
     <div id="#motd"></div>
     Please enter your name to join the game<br/>
     <form id="dologin">
-      <input type="text"><input type="submit" value="Join"/>
+      <input id="loginname" type="text"><input type="submit" value="Join"/>
     </form>
   </div>
 </div>
@@ -48,11 +53,13 @@
         'reconnection delay': 500,
         'max reconnection attempts': 10
       }),
-      lastsent = [],
-      catlist = [];
+      lastsent,
+      catlist = [], filledlist = [];
 
-      
-  function buildPad() {
+  // basic html initialization
+  (function(){
+    var i, ol = $('<ol></ol>');
+
     function keyhandler(i) {
       return function(e) {
         var nval = $(e.target).val();
@@ -62,26 +69,30 @@
         }
       }
     }
-    var i, ol = $('<ol></ol>');
+
+    // Input pad
     for( i = 0; i < 12; ++i ) {
       ol.append(
         $('<li></li>').append(
-          $('<input type="text">').attr('id','pad_'+i).keypress( keyhandler(i) ) 
+          $('<input type="text">').attr('id','pad_'+i).keyup( keyhandler(i) ) 
         ) 
       );
     }
     $('#gamepad').append(ol);
     
+    // Category list
     for( i = 0; i < 12; ++i ) {
       catlist[i] = $('<li></li>');
       $('#categories').append(catlist[i]);
+      filledlist[i] = $('<li></li>');
+      $('#filledlist').append(filledlist[i]);
     }
-  }
+  })();
   
   // hook up login box
   $('#dologin').submit(function(){
     // log in
-    socket.emit( 'login', { name: $('#dologin>input').val() } );
+    socket.emit( 'login', { name: $('#loginame').val() } );
     $('#snd_bing')[0].play();
     $('#login').fadeOut(200);
     $('#ready').fadeIn(200);
@@ -113,6 +124,7 @@
     }
     
     // display login prompt
+    $('#loginname')[0].focus();
     $('#login').fadeIn(200);
   } );
 
@@ -126,6 +138,23 @@
     for( i = 0; i < 12; ++i ) {
       catlist[i].text(data.list[i]);
     }
+    $('#categories').show(200);
+  } );
+
+  // receive game start event
+  socket.on( 'startround', function (data) {
+    lastsent = [];
+    $('#letter').text(data.letter).css('color','black');
+    $('#gamepad').fadeIn(200);
+  } );
+
+  // end round
+  socket.on( 'stopround', function (data) {
+    for( i = 0; i < 12; ++i ) {
+      filledlist[i].text(data.list[i]);
+    }
+    $('#gamepad').fadeOut(200);
+    $('#filledpad').fadeIn(200);
   } );
 
   // receive game start event
