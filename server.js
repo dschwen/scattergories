@@ -1,11 +1,12 @@
 var app = require('http').createServer(handler)
   , io = require('socket.io').listen(app)
   , fs = require('fs')
+  , mime = require('mime')
   , mongodb = require('mongodb'), db, mcol = null, map = {d:[]}
   , files = [ 
       'lib/jquery-1.7.min.js', 'lib/jquery.event.drag-2.0.min.js', 'lib/all.js',
       'css/style.css',
-      'img/up0.svg', 'img/up1.svg','img/donw0.svg','img/down1.svg',
+      'img/up0.svg', 'img/up1.svg','img/down0.svg','img/down1.svg',
       'sound/complete.oga',
       'index.html', 'favicon.ico' 
     ], cache = {}
@@ -33,7 +34,7 @@ function addToCache(file) {
     if( err ) {
       throw err;
     }
-    cache['/'+file] = data;
+    cache['/'+file] = { data: data, type: mime.lookup(__dirname + '/' + file) };
   });
 }
 for( i = 0; i < files.length; ++i ) {
@@ -71,8 +72,8 @@ function handler( req, res ) {
     return res.end('Error loading ' + req.url);
   }
 
-  res.writeHead(200);
-  res.end(cache[req.url]);
+  res.writeHead( 200, { 'Content-Type': cache[req.url].type } );
+  res.end(cache[req.url].data);
 }
 
 // change all users with status from to status to
