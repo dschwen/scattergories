@@ -180,7 +180,7 @@ initGame();
 io.sockets.on('connection', function (socket) {
 
   socket.emit( 'ready', { motd: '' } );
-  users[socket.id] = { ready: false, list: [], name: null, vote: {}, status: 0, socket: socket };
+  users[socket.id] = { ready: false, list: [], name: null, chat: '', vote: {}, status: 0, socket: socket };
   
   socket.on('login', function (data) {
     users[socket.id].name = data.name;
