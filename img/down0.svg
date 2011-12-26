@@ -13,8 +13,8 @@
    height="272.57117"
    id="svg3836"
    version="1.1"
-   inkscape:version="0.47 r22583"
-   sodipodi:docname="New document 15">
+   inkscape:version="0.48.1 r9760"
+   sodipodi:docname="down0.svg">
   <defs
      id="defs3838">
     <inkscape:perspective
@@ -58,7 +58,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -68,7 +68,7 @@
      id="layer1"
      transform="translate(-308.66364,-259.0766)">
     <path
-       style="color:#000000;fill:#ff5555;stroke:#550000;stroke-width:10;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       style="color:#000000;fill:none;stroke:#550000;stroke-width:10;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
        d="m 526.25174,406.08949 c -8.30908,4.30288 -22.81243,-1.73177 -33,2.5 -18.49764,7.68366 -41.25303,35.56553 -49.61828,42.47043 -15.01363,12.39265 -28.86122,17.60858 -37.38172,34.02957 -4.37065,8.42325 -10.03376,28.92341 -19,38 -2.00149,2.02612 -6.68273,3.91726 -9.5,3.5 -7.05667,-1.04514 -11.15856,-5.83954 -15.5,-11.5 -3.72958,-4.8627 -6.37038,-10.88294 -6,-17 1.3169,-21.74956 24.61601,-36.1668 31,-57 2.35201,-7.67545 6.69393,-17.48759 2,-24 -5.93725,-8.2374 -33.11669,-6.499 -48,-14 -9.34691,-4.71072 -20.34891,-9.62328 -25,-19 -3.70302,-7.46539 -3.18903,-17.301 0,-25 2.52558,-6.09728 8.78128,-7.78446 11,-13.99999 2.25242,-6.30995 -1.82669,-13.92557 1,-20 3.23761,-6.9575 13.61732,-9.70071 18,-16 3.13968,-4.51272 1.48792,-8.77063 5,-13 5.62207,-6.77029 13.75596,-5.79868 20,-12 3.91494,-3.88815 6.74304,-10.48963 11,-14 6.36209,-5.24631 15.75493,-6.13738 24,-6 9.70547,0.16171 15.32727,4.18732 25,5 9.02359,0.75814 21.35065,-2.68119 30,0 21.44566,6.6479 31.75823,30.28497 51,44 7.45344,5.31262 20.25332,-1.18547 27,5 11.98148,10.98482 12.21983,29.89737 10,45.99999 -2.28741,16.59287 -8.12626,34.29758 -23,42 z"
        id="path2890-1"
        sodipodi:nodetypes="ccssssssssssssssssssssssss"
