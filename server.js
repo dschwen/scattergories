@@ -5,6 +5,7 @@ var app = require('http').createServer(handler)
   , files = [ 
       'lib/jquery-1.7.min.js', 'lib/jquery.event.drag-2.0.min.js', 'lib/all.js',
       'css/style.css',
+      'img/up0.svg', 'img/up1.svg','img/donw0.svg','img/down1.svg',
       'sound/complete.oga',
       'index.html', 'favicon.ico' 
     ], cache = {}
@@ -17,7 +18,7 @@ var app = require('http').createServer(handler)
             'At the mall', 'Famous monuments', 'Games', 'TV shows', 'Plants', 'Pets', 
             'At the cocktail bar', 'Funny movies', 'Scary things','Cars, makes & models',
             'Bodies of water', 'Musical acts', 'Countries', 'Trouble with the law', 
-            'Car parts', 'Magazines and journals' 
+            'Car parts', 'Magazines and journals', 'Dream jobs'
           ]
   , selected = []
   , letters = 'ABCDEFGHIJKLMNOPRSTUVWZ'
