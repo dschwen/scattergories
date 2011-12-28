@@ -123,3 +123,14 @@ div.red {
 #categories, #gamepad, #filledpad {
   display: none;
 }
+
+#replacement-2 {
+  width: 100px;
+  height: 55px;
+  padding: 55px 0 0;
+  margin: 0;
+  border: 0;
+  background: transparent url('../img/up0.png') no-repeat center top;
+  overflow: hidden;
+  cursor: pointer;
+}
