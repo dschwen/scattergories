@@ -1,0 +1,30 @@
+{
+  "name": "scattergories",
+  "version": "1.0.0",
+  "description": "Word guessing game",
+  "main": "server.js",
+  "dependencies": {
+    "mime": "^1.3.4",
+    "mongodb": "^2.2.4",
+    "socket.io": "^0.9.13"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dschwen/scattergories.git"
+  },
+  "keywords": [
+    "game",
+    "websockets"
+  ],
+  "author": "Daniel Schwen",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dschwen/scattergories/issues"
+  },
+  "homepage": "https://github.com/dschwen/scattergories#readme"
+}
